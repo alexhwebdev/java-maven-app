@@ -1,42 +1,85 @@
-// ---------- java-maven-pipeline, S8 L10 ----------
-def gv
-
+// ---------- java-maven-pipeline, S8 L11 ----------
 pipeline {
     agent any
-    tools {
-        maven 'maven-3.9'
-    }
+
     stages {
-        stage('init') {
+        stage('test') {
             steps {
                 script {
-                    gv = load 'script.groovy'
+                    echo "Testing the application..."
+                    echo "Executing pipeline for branch $BRANCH_NAME"
                 }
             }
         }
-        stage('build jar') {
-            steps {
-                script {
-                    gv.buildJar()
+        stage('build') {
+            when {
+                expression {
+                    BRANCH_NAME == 'main'
                 }
             }
-        }
-        stage('build image') {
             steps {
                 script {
-                    gv.buildImage()
+                    echo "Building the application..."
                 }
             }
         }
         stage('deploy') {
+            when {
+                expression {
+                    BRANCH_NAME == 'main'
+                }
+            }
             steps {
                 script {
-                    gv.deployApp()
+                    echo "Deploying the application..."
                 }
             }
         }
     }
 }
+
+
+
+
+// // ---------- java-maven-pipeline, S8 L10 ----------
+// def gv
+
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build jar') {
+//             steps {
+//                 script {
+//                     gv.buildJar()
+//                 }
+//             }
+//         }
+//         stage('build image') {
+//             steps {
+//                 script {
+//                     gv.buildImage()
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     gv.deployApp()
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
