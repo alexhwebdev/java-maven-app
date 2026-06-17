@@ -1,3 +1,5 @@
+def gv
+
 pipeline {
     agent any
     // tools {
@@ -13,10 +15,18 @@ pipeline {
         booleanParam(name: 'executeTests', defaultValue: true, description: 'execute tests')
     }
     stages {
+        stage('init') {
+            steps {
+                script {
+                    gv = load 'script.groovy'
+                }
+            }
+        }
         stage('build') {
             steps {
-                echo 'building the application...'
-                //  echo "building version ${NEW_VERSION}"
+                script {
+                    gv.buildApp()
+                }
             }
         }
         stage('test') {
@@ -26,28 +36,34 @@ pipeline {
                 }
             }
             steps {
-                echo 'testing the application...'
+                script {
+                    gv.testApp()
+                }
             }
         }
         stage('deploy') {
             steps {
-                echo 'deploying the application...'
-                echo "deploying version ${params.VERSION}"
-                // // Option 1:
-                // //  echo "deploying with ${SERVER_CREDENTIALS}"
-                // //  sh "${SERVER_CREDENTIALS}"
+                script {
+                    gv.deployApp()
+                }
 
-                // // Option 2:
-                // withCredentials([
-                //     usernamePassword(
-                //         credentials: 'server-credentials', 
-                //         usernameVariable: 'USER',
-                //         passwordVariable: 'PWD'
-                //     )
-                // ]){
-                //     echo "deploying with ${USER} and ${PWD}"
-                //     sh "some script ${USER} ${PWD}"
-                // }
+                // echo 'deploying the application...'
+                // echo "deploying version ${params.VERSION}"
+                // // // Option 1:
+                // // //  echo "deploying with ${SERVER_CREDENTIALS}"
+                // // //  sh "${SERVER_CREDENTIALS}"
+
+                // // // Option 2:
+                // // withCredentials([
+                // //     usernamePassword(
+                // //         credentials: 'server-credentials', 
+                // //         usernameVariable: 'USER',
+                // //         passwordVariable: 'PWD'
+                // //     )
+                // // ]){
+                // //     echo "deploying with ${USER} and ${PWD}"
+                // //     sh "some script ${USER} ${PWD}"
+                // // }
 
             }
         }
