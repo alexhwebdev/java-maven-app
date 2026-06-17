@@ -1,87 +1,31 @@
-def gv
-
+// ---------- java-maven-pipeline, S8 L10 ----------
 pipeline {
     agent any
-    // tools {
-    //     maven 'maven-3.9'
-    // }
-    // environment {
-    //     NEW_VERSION = '1.3.0'
-    //     // Option 1:
-    //     // SERVER_CREDENTIALS = credentials('server-credentials')
-    // }
-    parameters {
-        choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: 'description')
-        booleanParam(name: 'executeTests', defaultValue: true, description: 'execute tests')
+    tools {
+        maven 'maven-3.9'
     }
     stages {
-        stage('init') {
+        stage('build jar') {
             steps {
-                script {
-                    gv = load 'script.groovy'
-                }
+                echo 'building the application...'
+                sh 'mvn package'
             }
         }
-        stage('build') {
+        stage('build image') {
             steps {
-                script {
-                    gv.buildApp()
-                }
-            }
-        }
-        stage('test') {
-            when {
-                expression {
-                    params.executeTests
-                }
-            }
-            steps {
-                script {
-                    gv.testApp()
+                echo 'building the docker image...'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                    // sh "docker build -t nanatwn/demo-app:jma-2.0 ."
+                    sh "docker build -t alexhwebdev/nana-demo-app:jma-2.0 ."
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    // sh "docker push nanatwn/demo-app:jma-2.0"
+                    sh "docker push alexhwebdev/nana-demo-app:jma-2.0"
                 }
             }
         }
         stage('deploy') {
-            // input {
-            //     message "Select the environment to deploy to"
-            //     ok "Done"
-            //     parameters {
-            //         choice(name: 'ONE', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
-            //         choice(name: 'TWO', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
-            //     }
-            // }
             steps {
-                script {
-                    env.ENV = input message: "Select the environment to deploy to", ok: "Done", parameters: [
-                        choice(name: 'ONE', choices: ['dev', 'staging', 'prod'], description: ''), 
-                        // choice(name: 'TWO', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
-                    ]    
-
-                    gv.deployApp()
-                    // echo "deploying to ${ONE} environment"
-                    // echo "deploying to ${TWO} environment"
-
-                    echo "deploying to ${ENV} environment"
-                }
-
-                // echo 'deploying the application...'
-                // echo "deploying version ${params.VERSION}"
-                // // // Option 1:
-                // // //  echo "deploying with ${SERVER_CREDENTIALS}"
-                // // //  sh "${SERVER_CREDENTIALS}"
-
-                // // // Option 2:
-                // // withCredentials([
-                // //     usernamePassword(
-                // //         credentials: 'server-credentials', 
-                // //         usernameVariable: 'USER',
-                // //         passwordVariable: 'PWD'
-                // //     )
-                // // ]){
-                // //     echo "deploying with ${USER} and ${PWD}"
-                // //     sh "some script ${USER} ${PWD}"
-                // // }
-
+                echo 'deploying the application...'
             }
         }
     }
@@ -92,6 +36,102 @@ pipeline {
 
 
 
+
+// ---------- java-maven-pipeline ----------
+// def gv
+
+// pipeline {
+//     agent any
+//     // tools {
+//     //     maven 'maven-3.9'
+//     // }
+//     // environment {
+//     //     NEW_VERSION = '1.3.0'
+//     //     // Option 1:
+//     //     // SERVER_CREDENTIALS = credentials('server-credentials')
+//     // }
+//     parameters {
+//         choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: 'description')
+//         booleanParam(name: 'executeTests', defaultValue: true, description: 'execute tests')
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build') {
+//             steps {
+//                 script {
+//                     gv.buildApp()
+//                 }
+//             }
+//         }
+//         stage('test') {
+//             when {
+//                 expression {
+//                     params.executeTests
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     gv.testApp()
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             // input {
+//             //     message "Select the environment to deploy to"
+//             //     ok "Done"
+//             //     parameters {
+//             //         choice(name: 'ONE', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
+//             //         choice(name: 'TWO', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
+//             //     }
+//             // }
+//             steps {
+//                 script {
+//                     env.ENV = input message: "Select the environment to deploy to", ok: "Done", parameters: [
+//                         choice(name: 'ONE', choices: ['dev', 'staging', 'prod'], description: ''), 
+//                         // choice(name: 'TWO', choices: ['dev', 'staging', 'prod'], description: 'Select environment')
+//                     ]    
+
+//                     gv.deployApp()
+//                     // echo "deploying to ${ONE} environment"
+//                     // echo "deploying to ${TWO} environment"
+
+//                     echo "deploying to ${ENV} environment"
+//                 }
+
+//                 // echo 'deploying the application...'
+//                 // echo "deploying version ${params.VERSION}"
+//                 // // // Option 1:
+//                 // // //  echo "deploying with ${SERVER_CREDENTIALS}"
+//                 // // //  sh "${SERVER_CREDENTIALS}"
+
+//                 // // // Option 2:
+//                 // // withCredentials([
+//                 // //     usernamePassword(
+//                 // //         credentials: 'server-credentials', 
+//                 // //         usernameVariable: 'USER',
+//                 // //         passwordVariable: 'PWD'
+//                 // //     )
+//                 // // ]){
+//                 // //     echo "deploying with ${USER} and ${PWD}"
+//                 // //     sh "some script ${USER} ${PWD}"
+//                 // // }
+
+//             }
+//         }
+//     }
+// }
+
+
+
+
+
+// ---------- original code from nana gitlab ----------
 // def gv
 
 // pipeline {
@@ -165,7 +205,7 @@ pipeline {
 
 
 
-
+// ---------- starter code ----------
 // pipeline {
 //     agent any
 //     tools {
