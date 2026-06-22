@@ -1,12 +1,12 @@
 def buildApp() {
     echo 'building the application...'
 }
-
+// ----------COMMENTED OUT : java-maven-pipeline, S8 L14 ----------
 // def buildJar() {
 //     echo 'building the application...'
 //     sh 'mvn package'
 // }
-
+// ----------COMMENTED OUT : java-maven-pipeline, S8 L14 ----------
 // def buildImage() {
 //     echo 'building the docker image...'
 //     withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
