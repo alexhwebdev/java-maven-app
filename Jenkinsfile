@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // gv.buildImage()
-                    buildImage()
+                    buildImage('alexhwebdev/nana-demo-app:jma-3.0')
                 }
             }
         }
