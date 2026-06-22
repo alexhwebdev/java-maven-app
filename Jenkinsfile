@@ -1,42 +1,88 @@
-// ---------- java-maven-pipeline, S8 L11 ----------
+#!/user/bin/env groovy
+@Library('jenkins-shared-library')
+
+// ---------- java-maven-pipeline, S8 L14 ----------
+def gv
+
 pipeline {
     agent any
-
+    tools {
+        maven 'maven-3.9'
+    }
     stages {
-        stage('test') {
+        stage('init') {
             steps {
                 script {
-                    echo "Testing the application..."
-                    echo "Executing pipeline for branch $BRANCH_NAME"
+                    gv = load 'script.groovy'
                 }
             }
         }
-        stage('build') {
-            when {
-                expression {
-                    BRANCH_NAME == 'main'
-                }
-            }
+        stage('build jar') {
             steps {
                 script {
-                    echo "Building the application..."
+                    // gv.buildJar()
+                    buildJar()
+                }
+            }
+        }
+        stage('build image') {
+            steps {
+                script {
+                    // gv.buildImage()
+                    buildImage()
                 }
             }
         }
         stage('deploy') {
-            when {
-                expression {
-                    BRANCH_NAME == 'main'
-                }
-            }
             steps {
                 script {
-                    echo "Deploying the application..."
+                    gv.deployApp()
                 }
             }
         }
     }
 }
+
+
+// // ---------- java-maven-pipeline, S8 L11 ----------
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('test') {
+//             steps {
+//                 script {
+//                     echo "Testing the application..."
+//                     echo "Executing pipeline for branch $BRANCH_NAME"
+//                 }
+//             }
+//         }
+//         stage('build') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Building the application..."
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Deploying the application..."
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
