@@ -1,5 +1,14 @@
 #!/user/bin/env groovy
-@Library('jenkins-shared-library')
+
+library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
+    [$class: 'GitSCMSource',
+        remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
+        credentialsId: 'docker-hub-repo'
+        // docker-hub-repo = github credentials
+    ]
+)
+
+// @Library('jenkins-shared-library')
 
 // ---------- java-maven-pipeline, S8 L14 ----------
 def gv
