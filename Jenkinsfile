@@ -1,42 +1,178 @@
-// ---------- java-maven-pipeline, S8 L11 ----------
+// ---------- S9 L8 ----------
+#!/usr/bin/env groovy
+
+library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
+    [$class: 'GitSCMSource',
+        remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
+        credentialsId: 'docker-hub-repo'
+        // docker-hub-repo = github credentials
+    ]
+)
+
 pipeline {
     agent any
-
+    tools {
+        maven 'Maven'
+    }
+    environment {
+        IMAGE_NAME = 'alexhwebdev/nana-demo-app:java-maven-1.0'
+    }
     stages {
-        stage('test') {
+        stage('build app') {
             steps {
-                script {
-                    echo "Testing the application..."
-                    echo "Executing pipeline for branch $BRANCH_NAME"
-                }
+                echo 'building application jar...'
+                buildJar()
             }
         }
-        stage('build') {
-            when {
-                expression {
-                    BRANCH_NAME == 'main'
-                }
-            }
+        stage('build image') {
             steps {
                 script {
-                    echo "Building the application..."
+                    echo 'building the docker image...'
+                    buildImage(env.IMAGE_NAME)
+                    dockerLogin()
+                    dockerPush(env.IMAGE_NAME)
                 }
             }
-        }
-        stage('deploy') {
-            when {
-                expression {
-                    BRANCH_NAME == 'main'
-                }
-            }
+        } 
+        stage("deploy") {
             steps {
                 script {
-                    echo "Deploying the application..."
+                    echo 'deploying docker image to EC2...'
+                    def dockerCmd = "docker run -p 8080:8080 -d ${IMAGE_NAME}"
+                    sshagent(['ec2-server-key']) {
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
+                    }
                 }
-            }
+            }               
         }
     }
 }
+// ---------- Started with this snippet ----------
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('test') {
+//             steps {
+//                 echo 'testing the application...'
+//             }
+//         }
+//         stage('build') {
+//             steps {
+//                 echo 'building the application...'
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     def dockerCmd = 'docker run -p 3080:3080 -d alexhwebdev/nana-demo-app:v1'
+//                     sshagent(['ec2-server-key']) {
+//                         sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+
+
+// // ---------- java-maven-pipeline, S8 L14 ----------
+// #!/user/bin/env groovy
+
+// library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
+//     [$class: 'GitSCMSource',
+//         remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
+//         credentialsId: 'docker-hub-repo'
+//         // docker-hub-repo = github credentials
+//     ]
+// )
+
+// // @Library('jenkins-shared-library')
+// def gv
+
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build jar') {
+//             steps {
+//                 script {
+//                     // gv.buildJar()
+//                     buildJar()
+//                 }
+//             }
+//         }
+//         stage('build image') {
+//             steps {
+//                 script {
+//                     // gv.buildImage()
+//                     buildImage('alexhwebdev/nana-demo-app:jma-3.0')
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     gv.deployApp()
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+// // ---------- java-maven-pipeline, S8 L11 ----------
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('test') {
+//             steps {
+//                 script {
+//                     echo "Testing the application..."
+//                     echo "Executing pipeline for branch $BRANCH_NAME"
+//                 }
+//             }
+//         }
+//         stage('build') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Building the application..."
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Deploying the application..."
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
