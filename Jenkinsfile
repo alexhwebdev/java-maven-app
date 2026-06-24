@@ -72,6 +72,9 @@ pipeline {
                 script {
                     // NOTE : docker-hub-repo = github credentials
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh 'git config --global user.name "Young Hong"'
+                        sh 'git config --global user.email "alexhwebdev@gmail.com"'
+
                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/alexhwebdev/java-maven-app.git"
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump"'
