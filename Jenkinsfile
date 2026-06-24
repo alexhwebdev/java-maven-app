@@ -70,8 +70,7 @@ pipeline {
         stage('commit version update'){
             steps {
                 script {
-                    // NOTE : docker-hub-repo = github credentials
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                    withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
                         sh 'git config --global user.name "Young Hong"'
                         sh 'git config --global user.email "alexhwebdev@gmail.com"'
 
