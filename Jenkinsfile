@@ -220,6 +220,146 @@ pipeline {
 
 
 
+// // ---------- java-maven-pipeline, S8 L14 ----------
+// #!/user/bin/env groovy
+
+// library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
+//     [$class: 'GitSCMSource',
+//         remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
+//         credentialsId: 'docker-hub-repo'
+//         // docker-hub-repo = github credentials
+//     ]
+// )
+
+// // @Library('jenkins-shared-library')
+// def gv
+
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build jar') {
+//             steps {
+//                 script {
+//                     // gv.buildJar()
+//                     buildJar()
+//                 }
+//             }
+//         }
+//         stage('build image') {
+//             steps {
+//                 script {
+//                     // gv.buildImage()
+//                     buildImage('alexhwebdev/nana-demo-app:jma-3.0')
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     gv.deployApp()
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+// // ---------- java-maven-pipeline, S8 L11 ----------
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('test') {
+//             steps {
+//                 script {
+//                     echo "Testing the application..."
+//                     echo "Executing pipeline for branch $BRANCH_NAME"
+//                 }
+//             }
+//         }
+//         stage('build') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Building the application..."
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             when {
+//                 expression {
+//                     BRANCH_NAME == 'main'
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     echo "Deploying the application..."
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+
+
+// // ---------- java-maven-pipeline, S8 L10 ----------
+// def gv
+
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build jar') {
+//             steps {
+//                 script {
+//                     gv.buildJar()
+//                 }
+//             }
+//         }
+//         stage('build image') {
+//             steps {
+//                 script {
+//                     gv.buildImage()
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     gv.deployApp()
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+
+
 
 
 
