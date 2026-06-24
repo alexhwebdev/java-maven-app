@@ -38,7 +38,7 @@ pipeline {
                     echo 'deploying docker image to EC2...'
                     // def dockerCmd = "docker run -p 8080:8080 -d ${IMAGE_NAME}"
                     // def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
-                    def shellCmd = "bash ./server-cmds.sh"
+                    def shellCmd = "bash ./server-cmds.sh ${IMAGE_NAME}"
 
                     sshagent(['ec2-server-key']) {
                         // sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
