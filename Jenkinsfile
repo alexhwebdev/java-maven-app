@@ -1,6 +1,4 @@
 // ---------- S9 L8 ----------
-#!/usr/bin/env groovy
-
 library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
     [$class: 'GitSCMSource',
         remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
@@ -12,7 +10,7 @@ library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
 pipeline {
     agent any
     tools {
-        maven 'Maven'
+        maven 'maven-3.9'
     }
     environment {
         IMAGE_NAME = 'alexhwebdev/nana-demo-app:java-maven-1.0'
@@ -38,9 +36,12 @@ pipeline {
             steps {
                 script {
                     echo 'deploying docker image to EC2...'
-                    def dockerCmd = "docker run -p 8080:8080 -d ${IMAGE_NAME}"
+                    // def dockerCmd = "docker run -p 8080:8080 -d ${IMAGE_NAME}"
+                    def dockerComposeCmd = "docker-compose -f docker-compose.yml up --detach"
                     sshagent(['ec2-server-key']) {
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
+                        // sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
+                        sh "scp docker-compose.yml ec2-user@18.225.181.211:/home/ec2-user"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerComposeCmd}"
                     }
                 }
             }               
