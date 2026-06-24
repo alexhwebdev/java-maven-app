@@ -1,47 +1,87 @@
-#!/user/bin/env groovy
-@Library('jenkins-shared-library')
-
-// ---------- java-maven-pipeline, S8 L14 ----------
-def gv
-
+// ---------- S9 L8 ----------
 pipeline {
     agent any
     tools {
         maven 'maven-3.9'
     }
     stages {
-        stage('init') {
+        stage('test') {
             steps {
-                script {
-                    gv = load 'script.groovy'
-                }
+                echo 'testing the application...'
             }
         }
-        stage('build jar') {
+        stage('build') {
             steps {
-                script {
-                    // gv.buildJar()
-                    buildJar()
-                }
-            }
-        }
-        stage('build image') {
-            steps {
-                script {
-                    // gv.buildImage()
-                    buildImage()
-                }
+                echo 'building the application...'
             }
         }
         stage('deploy') {
             steps {
                 script {
-                    gv.deployApp()
+                    def dockerCmd = 'docker run -p 3080:3080 -d alexhwebdev/nana-demo-app:v1'
+                    sshagent(['ec2-server-key']) {
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@18.225.181.211 ${dockerCmd}"
+                    }
                 }
             }
         }
     }
 }
+
+
+
+// // ---------- java-maven-pipeline, S8 L14 ----------
+// #!/user/bin/env groovy
+
+// library identifier: 'jenkins-shared-library@main', retriever: modernSCM(
+//     [$class: 'GitSCMSource',
+//         remote: 'https://github.com/alexhwebdev/jenkins-shared-library.git',
+//         credentialsId: 'docker-hub-repo'
+//         // docker-hub-repo = github credentials
+//     ]
+// )
+
+// // @Library('jenkins-shared-library')
+// def gv
+
+// pipeline {
+//     agent any
+//     tools {
+//         maven 'maven-3.9'
+//     }
+//     stages {
+//         stage('init') {
+//             steps {
+//                 script {
+//                     gv = load 'script.groovy'
+//                 }
+//             }
+//         }
+//         stage('build jar') {
+//             steps {
+//                 script {
+//                     // gv.buildJar()
+//                     buildJar()
+//                 }
+//             }
+//         }
+//         stage('build image') {
+//             steps {
+//                 script {
+//                     // gv.buildImage()
+//                     buildImage('alexhwebdev/nana-demo-app:jma-3.0')
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     gv.deployApp()
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 // // ---------- java-maven-pipeline, S8 L11 ----------
