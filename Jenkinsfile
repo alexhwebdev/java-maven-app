@@ -12,10 +12,21 @@ pipeline {
     tools {
         maven 'maven-3.9'
     }
-    environment {
-        IMAGE_NAME = 'alexhwebdev/nana-demo-app:java-maven-2.0'
-    }
+    // environment {
+    //     IMAGE_NAME = 'alexhwebdev/nana-demo-app:java-maven-2.0'
+    // }
     stages {
+        stage('increment version') {
+            script {
+                echo 'incrementing app version...'
+                sh 'mvn build-helper:parse-version versions:set \
+                    -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
+                    versions:commit'
+                def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                def version = matcher[0][1]
+                env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+            }
+        }
         stage('build app') {
             steps {
                 echo 'building application jar...'
@@ -53,6 +64,19 @@ pipeline {
                     }
                 }
             }               
+        }
+        stage('commit version update'){
+            steps {
+                script {
+                    // NOTE : docker-hub-repo = github credentials
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh "git remote set-url origin https://${USER}:${PASS}@github.com/alexhwebdev/java-maven-app.git"
+                        sh 'git add .'
+                        sh 'git commit -m "ci: version bump"'
+                        sh 'git push origin HEAD:jenkins-jobs'
+                    }
+                }
+            }
         }
     }
 }
